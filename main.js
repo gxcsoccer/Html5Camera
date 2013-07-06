@@ -3,7 +3,11 @@ window.onload = function() {
 		video = document.querySelector('#video'),
 		pics = document.querySelectorAll('#right > div'),
 		startbutton = document.querySelector('#startbutton'),
-		hiddenCanvas = document.createElement('canvas');
+		comparebutton = document.querySelector('#comparebutton'),
+		hiddenCanvas = document.createElement('canvas'),
+		image1 = new Image(),
+		image2 = new Image(),
+		imgs = [image1, image2];
 	width = 300, height = 0, i = 0;
 
 	navigator.getMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);
@@ -29,7 +33,7 @@ window.onload = function() {
 			video.setAttribute('width', width);
 			video.setAttribute('height', height);
 			video.style.height = height + 'px';
-			for(var i = 0, len = pics.length; i < len; i++) {
+			for (var i = 0, len = pics.length; i < len; i++) {
 				pics[i].style.height = height + 'px';
 			}
 			streaming = true;
@@ -41,7 +45,8 @@ window.onload = function() {
 		hiddenCanvas.height = height;
 		hiddenCanvas.getContext('2d').drawImage(video, 0, 0, width, height);
 		var data = hiddenCanvas.toDataURL('image/png');
-		pics[i % 2].style.background = 'url(' + data + ')';
+		pics[i % 2].style.background = 'url(' + data + ') no-repeat';
+		imgs[i % 2].src = data;
 		i++;
 	}
 
@@ -50,4 +55,19 @@ window.onload = function() {
 		ev.preventDefault();
 	}, false);
 
+	comparebutton.addEventListener('click', function(ev) {
+		resemble(image1).compareTo(image2).ignoreColors().onComplete(function(data) {
+			alert('匹配度：' + (100 - data.misMatchPercentage) + '%');
+			/*
+    {
+      misMatchPercentage : 100, // %
+      isSameDimensions: true, // or false
+      getImageDataUrl: function(){}
+    }
+    */
+		});
+
+
+		ev.preventDefault();
+	}, false);
 };
